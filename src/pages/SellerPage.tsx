@@ -13,6 +13,20 @@ interface Product {
 }
 
 const SellerPage: React.FC = () => {
+  const categories = [
+    "Recycled Paperboard Boxes",
+    "Comestible Paper Cups",
+    "Plant-based PLA Packaging",
+    "Mushroom Packaging",
+    "Kraft Paper Bags",
+    "Biodegradable Food Containers",
+    "Hemp-based Packaging",
+    "Edible Packaging",
+    "Glass Containers",
+    "Beeswax Wraps",
+    "Other",
+  ];
+
   const user = useAuthStore((state) => state.user);
   const [products, setProducts] = useState<Product[]>([]);
   const [isAddingProduct, setIsAddingProduct] = useState(false);
@@ -20,7 +34,7 @@ const SellerPage: React.FC = () => {
     name: "",
     description: "",
     imageUrl: "",
-    category: "Raw Materials",
+    category: "Other",
     price: 0,
     quantity: 0,
   });
@@ -172,11 +186,9 @@ const SellerPage: React.FC = () => {
                   required
                   className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-green focus:border-primary-green"
                 >
-                  <option value="Raw Materials">Raw Materials</option>
-                  <option value="Packaging">Packaging</option>
-                  <option value="Equipment">Equipment</option>
-                  <option value="Supplies">Supplies</option>
-                  <option value="Other">Other</option>
+                  {categories.map((category) => (
+                    <option value={category}>{category}</option>
+                  ))}
                 </select>
               </div>
 
