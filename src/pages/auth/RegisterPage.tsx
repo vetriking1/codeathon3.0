@@ -564,7 +564,7 @@ const RegisterPage: React.FC = () => {
 
               <div className="grid md:grid-cols-2 gap-8">
                 <div>
-                  <h3 className="font-semibold text-gray-700">
+                  <h3 className="font-bold text-gray-700 text-xl">
                     Personal Details
                   </h3>
                   <p className="py-2">Username: {formData.username}</p>
@@ -575,7 +575,7 @@ const RegisterPage: React.FC = () => {
 
                 {formData.role === "buyer" && (
                   <div>
-                    <h3 className="font-semibold text-gray-700">
+                    <h3 className="font-bold text-gray-700 text-xl">
                       Buyer Details
                     </h3>
                     <p className="py-2">
