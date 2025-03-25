@@ -4,6 +4,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import authRoutes from "./routes/auth.js";
 import productRoutes from "./routes/products.js";
+import chatRoutes from "./routes/chat.js";
 
 dotenv.config();
 
@@ -22,6 +23,7 @@ mongoose
 // Use routes
 app.use("/auth", authRoutes);
 app.use("/products", productRoutes);
+app.use("/api", chatRoutes);
 
 // Root route
 app.get("/", (req, res) => {

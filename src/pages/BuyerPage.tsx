@@ -10,7 +10,10 @@ import {
   AlertCircle,
   Wind,
   MapPin,
+  Info,
+  MessageCircle,
 } from "lucide-react";
+import ChatBot from "../components/ChatBot";
 
 interface Product {
   _id: string;
@@ -41,6 +44,76 @@ interface AirQuality {
   location: string;
 }
 
+interface PackagingRecommendation {
+  category: string;
+  pollutants: string[];
+  description: string;
+  effectiveness: 'high' | 'medium' | 'low';
+}
+
+const packagingData: Record<string, PackagingRecommendation> = {
+  "Glass Packaging": {
+    category: "Glass Packaging",
+    pollutants: ["O3", "SO2"],
+    description: "Highly resistant, but energy-intensive to produce. Best for long-term use.",
+    effectiveness: 'high'
+  },
+  "Aluminum Packaging": {
+    category: "Aluminum Packaging",
+    pollutants: ["O3", "NO2"],
+    description: "Resistant to pollution but requires high energy to manufacture. Recyclable.",
+    effectiveness: 'high'
+  },
+  "Mushroom Packaging": {
+    category: "Mushroom Packaging",
+    pollutants: ["PM2.5", "NO2"],
+    description: "Degrades faster in high pollution areas. Best for clean environments.",
+    effectiveness: 'medium'
+  },
+  "Recycled Paper with Bio-Coating": {
+    category: "Recycled Paper with Bio-Coating",
+    pollutants: ["SO2", "NO2", "PM10"],
+    description: "Absorbs pollutants, but coatings (plant wax) improve durability.",
+    effectiveness: 'medium'
+  },
+  "Seaweed-Based Packaging": {
+    category: "Seaweed-Based Packaging",
+    pollutants: ["O3", "SO2"],
+    description: "Can degrade faster in ozone-heavy environments but remains biodegradable.",
+    effectiveness: 'medium'
+  },
+  "Biodegradable PLA Films": {
+    category: "Biodegradable PLA Films",
+    pollutants: ["O3", "NO2"],
+    description: "Ozone exposure reduces lifespan, but good for compostable packaging.",
+    effectiveness: 'low'
+  },
+  "Compostable PHA Plastics": {
+    category: "Compostable PHA Plastics",
+    pollutants: ["NO2", "PM10"],
+    description: "More resistant than PLA but affected by NO2. Suitable for food packaging.",
+    effectiveness: 'medium'
+  },
+  "Cloth Bags with Natural Coatings": {
+    category: "Cloth Bags with Natural Coatings",
+    pollutants: ["PM2.5", "SO2"],
+    description: "Fine particles and SO2 can weaken fibers. Coatings (e.g., beeswax) help.",
+    effectiveness: 'medium'
+  },
+  "Sugarcane Bagasse Containers": {
+    category: "Sugarcane Bagasse Containers",
+    pollutants: ["SO2", "NO2"],
+    description: "Can absorb pollutants but remains compostable. Best for food service.",
+    effectiveness: 'medium'
+  },
+  "Recyclable Corrugated Cardboard": {
+    category: "Recyclable Corrugated Cardboard",
+    pollutants: ["PM10", "NO2"],
+    description: "Pollutants weaken structure over time. Water-resistant coating recommended.",
+    effectiveness: 'low'
+  }
+};
+
 const BuyerPage: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [error, setError] = useState("");
@@ -49,19 +122,20 @@ const BuyerPage: React.FC = () => {
   const [airQuality, setAirQuality] = useState<AirQuality | null>(null);
   const [locationError, setLocationError] = useState("");
   const user = useAuthStore((state) => state.user);
+  const [showChat, setShowChat] = useState(false);
 
   const categories = [
     "all",
-    "Recycled Paperboard Boxes",
-    "Comestible Paper Cups",
-    "Plant-based PLA Packaging",
+    "Glass Packaging",
+    "Aluminum Packaging",
     "Mushroom Packaging",
-    "Kraft Paper Bags",
-    "Biodegradable Food Containers",
-    "Hemp-based Packaging",
-    "Edible Packaging",
-    "Glass Containers",
-    "Beeswax Wraps",
+    "Recycled Paper with Bio-Coating",
+    "Seaweed-Based Packaging",
+    "Biodegradable PLA Films",
+    "Compostable PHA Plastics",
+    "Cloth Bags with Natural Coatings",
+    "Sugarcane Bagasse Containers",
+    "Recyclable Corrugated Cardboard",
     "Other",
   ];
 
@@ -144,6 +218,34 @@ const BuyerPage: React.FC = () => {
       ? products
       : products.filter((product) => product.category === selectedCategory);
 
+  const getPackagingRecommendations = (airQualityData: AirQuality) => {
+    // Define thresholds for different pollutants
+    const thresholds = {
+      o3: 60, // Ozone threshold
+      no2: 40, // Nitrogen dioxide threshold
+      pm10: 50, // PM10 threshold
+      pm2_5: 25, // PM2.5 threshold
+      so2: 40, // Sulfur dioxide threshold (not in OpenWeather API but included for completeness)
+    };
+
+    // Check which pollutants are high in the area
+    const highPollutants: string[] = [];
+    if (airQualityData.components.o3 > thresholds.o3) highPollutants.push("O3");
+    if (airQualityData.components.no2 > thresholds.no2) highPollutants.push("NO2");
+    if (airQualityData.components.pm10 > thresholds.pm10) highPollutants.push("PM10");
+    if (airQualityData.components.pm2_5 > thresholds.pm2_5) highPollutants.push("PM2.5");
+
+    // Filter packaging options that address the high pollutants
+    return Object.values(packagingData)
+      .filter(packaging => 
+        packaging.pollutants.some(pollutant => highPollutants.includes(pollutant))
+      )
+      .sort((a, b) => {
+        const effectivenessScore = { high: 3, medium: 2, low: 1 };
+        return effectivenessScore[b.effectiveness] - effectivenessScore[a.effectiveness];
+      });
+  };
+
   if (!user || user.role !== "buyer") {
     return (
       <div className="min-h-screen bg-beige flex items-center justify-center">
@@ -175,66 +277,114 @@ const BuyerPage: React.FC = () => {
     <div className="min-h-screen bg-beige">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {airQuality && (
-          <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <Wind className="h-8 w-8 text-primary-green" />
-                <div>
-                  <h2 className="text-xl font-semibold text-dark-teal">
-                    Air Quality Index
-                  </h2>
-                  <div className="flex items-center mt-1">
-                    <MapPin className="h-4 w-4 text-gray-500 mr-2" />
-                    <p className="text-sm text-gray-600">
-                      {airQuality.location}
-                    </p>
+          <>
+            <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-4">
+                  <Wind className="h-8 w-8 text-primary-green" />
+                  <div>
+                    <h2 className="text-xl font-semibold text-dark-teal">
+                      Air Quality Index
+                    </h2>
+                    <div className="flex items-center mt-1">
+                      <MapPin className="h-4 w-4 text-gray-500 mr-2" />
+                      <p className="text-sm text-gray-600">
+                        {airQuality.location}
+                      </p>
+                    </div>
                   </div>
                 </div>
+                <div className="text-right">
+                  <p
+                    className={`text-2xl font-bold ${
+                      getAQIDescription(airQuality.aqi).color
+                    }`}
+                  >
+                    {getAQIDescription(airQuality.aqi).text}
+                  </p>
+                  <p className="text-sm text-gray-500">AQI: {airQuality.aqi}</p>
+                </div>
               </div>
-              <div className="text-right">
-                <p
-                  className={`text-2xl font-bold ${
-                    getAQIDescription(airQuality.aqi).color
-                  }`}
-                >
-                  {getAQIDescription(airQuality.aqi).text}
-                </p>
-                <p className="text-sm text-gray-500">AQI: {airQuality.aqi}</p>
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mt-4">
+                <div className="text-center p-3 bg-gray-50 rounded-lg">
+                  <p className="text-sm text-gray-600">PM2.5</p>
+                  <p className="text-lg font-semibold text-dark-teal">
+                    {airQuality.components.pm2_5.toFixed(1)}
+                  </p>
+                </div>
+                <div className="text-center p-3 bg-gray-50 rounded-lg">
+                  <p className="text-sm text-gray-600">PM10</p>
+                  <p className="text-lg font-semibold text-dark-teal">
+                    {airQuality.components.pm10.toFixed(1)}
+                  </p>
+                </div>
+                <div className="text-center p-3 bg-gray-50 rounded-lg">
+                  <p className="text-sm text-gray-600">O₃</p>
+                  <p className="text-lg font-semibold text-dark-teal">
+                    {airQuality.components.o3.toFixed(1)}
+                  </p>
+                </div>
+                <div className="text-center p-3 bg-gray-50 rounded-lg">
+                  <p className="text-sm text-gray-600">NO₂</p>
+                  <p className="text-lg font-semibold text-dark-teal">
+                    {airQuality.components.no2.toFixed(1)}
+                  </p>
+                </div>
+                <div className="text-center p-3 bg-gray-50 rounded-lg">
+                  <p className="text-sm text-gray-600">CO</p>
+                  <p className="text-lg font-semibold text-dark-teal">
+                    {airQuality.components.co.toFixed(1)}
+                  </p>
+                </div>
               </div>
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mt-4">
-              <div className="text-center p-3 bg-gray-50 rounded-lg">
-                <p className="text-sm text-gray-600">PM2.5</p>
-                <p className="text-lg font-semibold text-dark-teal">
-                  {airQuality.components.pm2_5.toFixed(1)}
-                </p>
+            
+            <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
+              <div className="flex items-center space-x-4 mb-6">
+                <Info className="h-8 w-8 text-primary-green" />
+                <h2 className="text-xl font-semibold text-dark-teal">
+                  Packaging Recommendations
+                </h2>
               </div>
-              <div className="text-center p-3 bg-gray-50 rounded-lg">
-                <p className="text-sm text-gray-600">PM10</p>
-                <p className="text-lg font-semibold text-dark-teal">
-                  {airQuality.components.pm10.toFixed(1)}
-                </p>
-              </div>
-              <div className="text-center p-3 bg-gray-50 rounded-lg">
-                <p className="text-sm text-gray-600">O₃</p>
-                <p className="text-lg font-semibold text-dark-teal">
-                  {airQuality.components.o3.toFixed(1)}
-                </p>
-              </div>
-              <div className="text-center p-3 bg-gray-50 rounded-lg">
-                <p className="text-sm text-gray-600">NO₂</p>
-                <p className="text-lg font-semibold text-dark-teal">
-                  {airQuality.components.no2.toFixed(1)}
-                </p>
-              </div>
-              <div className="text-center p-3 bg-gray-50 rounded-lg">
-                <p className="text-sm text-gray-600">CO</p>
-                <p className="text-lg font-semibold text-dark-teal">
-                  {airQuality.components.co.toFixed(1)}
-                </p>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {getPackagingRecommendations(airQuality).map((recommendation) => (
+                  <div
+                    key={recommendation.category}
+                    className="border rounded-lg p-4 hover:shadow-md transition-shadow"
+                  >
+                    <h3 className="font-semibold text-dark-teal mb-2">
+                      {recommendation.category}
+                    </h3>
+                    <div className="flex items-center mb-2">
+                      <span className={`px-2 py-1 rounded text-xs ${
+                        recommendation.effectiveness === 'high' 
+                          ? 'bg-green-100 text-green-800'
+                          : recommendation.effectiveness === 'medium'
+                          ? 'bg-yellow-100 text-yellow-800'
+                          : 'bg-red-100 text-red-800'
+                      }`}>
+                        {recommendation.effectiveness.toUpperCase()} Effectiveness
+                      </span>
+                    </div>
+                    <p className="text-sm text-gray-600 mb-2">
+                      {recommendation.description}
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {recommendation.pollutants.map((pollutant) => (
+                        <span
+                          key={pollutant}
+                          className="bg-primary-green bg-opacity-10 text-primary-green px-2 py-1 rounded-full text-xs"
+                        >
+                          {pollutant}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
-          </div>
+          </>
         )}
 
         {locationError && (
@@ -345,6 +495,24 @@ const BuyerPage: React.FC = () => {
           </div>
         )}
       </div>
+      
+      {/* Add ChatBot */}
+      {showChat && (
+        <ChatBot
+          categories={categories}
+          onClose={() => setShowChat(false)}
+        />
+      )}
+      
+      {/* Chat Button */}
+      {!showChat && (
+        <button
+          onClick={() => setShowChat(true)}
+          className="fixed bottom-4 right-4 bg-primary-green text-white p-4 rounded-full shadow-lg hover:bg-opacity-90 transition-colors"
+        >
+          <MessageCircle className="h-6 w-6" />
+        </button>
+      )}
     </div>
   );
 };
