@@ -1,6 +1,9 @@
 import { Search, Package, Leaf, Recycle } from "lucide-react";
+import { redirect } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const HomePage = () => {
+  const navigate = useNavigate();
   return (
     <div className="space-y-16 py-8">
       {/* Hero Section */}
@@ -17,10 +20,16 @@ const HomePage = () => {
                 with your values.
               </p>
               <div className="flex space-x-4">
-                <button className="px-6 py-3 bg-primary-green rounded-lg hover:bg-opacity-90 transition">
+                <button
+                  className="px-6 py-3 bg-primary-green rounded-lg hover:bg-opacity-90 transition"
+                  onClick={() => navigate("/login")}
+                >
                   Find Suppliers
                 </button>
-                <button className="px-6 py-3 border border-light-green rounded-lg hover:bg-primary-green transition">
+                <button
+                  onClick={() => navigate("/register")}
+                  className="px-6 py-3 border border-light-green rounded-lg hover:bg-primary-green transition"
+                >
                   Register as Supplier
                 </button>
               </div>
@@ -112,8 +121,11 @@ const HomePage = () => {
             Join OnTym Solutions today and connect with eco-conscious suppliers
             who share your values.
           </p>
-          <button className="px-8 py-4 bg-dark-teal rounded-lg hover:bg-opacity-90 transition">
-            Get Started Now
+          <button
+            className="px-8 py-4 bg-dark-teal rounded-lg hover:bg-opacity-90 transition"
+            onClick={() => navigate("/register")}
+          >
+            Get Started Now!
           </button>
         </div>
       </section>

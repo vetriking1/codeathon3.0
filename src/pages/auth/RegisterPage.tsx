@@ -147,7 +147,7 @@ const RegisterPage: React.FC = () => {
   // Validate entire step
   const validateStep = (currentStep: number): boolean => {
     let isValid = true;
-    const newErrors: FormErrors = { ...errors };
+    const newErrors: FormErrors | any = { ...errors };
 
     if (currentStep === 1) {
       const fieldsToValidate: (keyof FormData)[] = [
