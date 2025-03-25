@@ -53,7 +53,7 @@ const RegisterPage: React.FC = () => {
     password: "",
     confirmPassword: "",
     phoneNumber: "",
-    role: "buyer",
+    role: "supplier",
     sizeOfIndustry: "",
     productsExpected: [],
     productsOffered: [],

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useAuthStore } from "../store/authStore";
+import { config } from "../config";
 import {
   Leaf,
   Filter,
@@ -7,6 +8,8 @@ import {
   UserCircle,
   Mail,
   AlertCircle,
+  Wind,
+  MapPin,
 } from "lucide-react";
 
 interface Product {
@@ -26,11 +29,25 @@ interface Product {
   createdAt: string;
 }
 
+interface AirQuality {
+  aqi: number;
+  components: {
+    co: number;
+    no2: number;
+    o3: number;
+    pm2_5: number;
+    pm10: number;
+  };
+  location: string;
+}
+
 const BuyerPage: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const [airQuality, setAirQuality] = useState<AirQuality | null>(null);
+  const [locationError, setLocationError] = useState("");
   const user = useAuthStore((state) => state.user);
 
   const categories = [
@@ -48,7 +65,45 @@ const BuyerPage: React.FC = () => {
     "Other",
   ];
 
+  const getAirQuality = async (latitude: number, longitude: number) => {
+    try {
+      const response = await fetch(
+        `http://api.openweathermap.org/data/2.5/air_pollution?lat=${latitude}&lon=${longitude}&appid=799baf8abdc81da6e98902b9cab7a754`
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch air quality data");
+      }
+
+      const data = await response.json();
+
+      setAirQuality({
+        aqi: data.list[0].main.aqi,
+        components: data.list[0].components,
+        location: `Lat: ${latitude.toFixed(2)}, Lon: ${longitude.toFixed(2)}`, // Optional: show coordinates instead
+      });
+    } catch (err) {
+      setLocationError("Failed to fetch air quality data");
+    }
+  };
+
   useEffect(() => {
+    const getLocation = () => {
+      if ("geolocation" in navigator) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            getAirQuality(position.coords.latitude, position.coords.longitude);
+          },
+          (error) => {
+            setLocationError("Unable to get your location");
+          }
+        );
+      } else {
+        setLocationError("Geolocation is not supported by your browser");
+      }
+    };
+
+    getLocation();
     fetchProducts();
   }, []);
 
@@ -64,6 +119,23 @@ const BuyerPage: React.FC = () => {
       setError("Failed to load products");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const getAQIDescription = (aqi: number) => {
+    switch (aqi) {
+      case 1:
+        return { text: "Good", color: "text-green-600" };
+      case 2:
+        return { text: "Fair", color: "text-yellow-600" };
+      case 3:
+        return { text: "Moderate", color: "text-orange-600" };
+      case 4:
+        return { text: "Poor", color: "text-red-600" };
+      case 5:
+        return { text: "Very Poor", color: "text-purple-600" };
+      default:
+        return { text: "Unknown", color: "text-gray-600" };
     }
   };
 
@@ -102,6 +174,76 @@ const BuyerPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-beige">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {airQuality && (
+          <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <Wind className="h-8 w-8 text-primary-green" />
+                <div>
+                  <h2 className="text-xl font-semibold text-dark-teal">
+                    Air Quality Index
+                  </h2>
+                  <div className="flex items-center mt-1">
+                    <MapPin className="h-4 w-4 text-gray-500 mr-2" />
+                    <p className="text-sm text-gray-600">
+                      {airQuality.location}
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div className="text-right">
+                <p
+                  className={`text-2xl font-bold ${
+                    getAQIDescription(airQuality.aqi).color
+                  }`}
+                >
+                  {getAQIDescription(airQuality.aqi).text}
+                </p>
+                <p className="text-sm text-gray-500">AQI: {airQuality.aqi}</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mt-4">
+              <div className="text-center p-3 bg-gray-50 rounded-lg">
+                <p className="text-sm text-gray-600">PM2.5</p>
+                <p className="text-lg font-semibold text-dark-teal">
+                  {airQuality.components.pm2_5.toFixed(1)}
+                </p>
+              </div>
+              <div className="text-center p-3 bg-gray-50 rounded-lg">
+                <p className="text-sm text-gray-600">PM10</p>
+                <p className="text-lg font-semibold text-dark-teal">
+                  {airQuality.components.pm10.toFixed(1)}
+                </p>
+              </div>
+              <div className="text-center p-3 bg-gray-50 rounded-lg">
+                <p className="text-sm text-gray-600">O₃</p>
+                <p className="text-lg font-semibold text-dark-teal">
+                  {airQuality.components.o3.toFixed(1)}
+                </p>
+              </div>
+              <div className="text-center p-3 bg-gray-50 rounded-lg">
+                <p className="text-sm text-gray-600">NO₂</p>
+                <p className="text-lg font-semibold text-dark-teal">
+                  {airQuality.components.no2.toFixed(1)}
+                </p>
+              </div>
+              <div className="text-center p-3 bg-gray-50 rounded-lg">
+                <p className="text-sm text-gray-600">CO</p>
+                <p className="text-lg font-semibold text-dark-teal">
+                  {airQuality.components.co.toFixed(1)}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {locationError && (
+          <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-md mb-8 flex items-center">
+            <AlertCircle className="h-6 w-6 mr-3 text-red-500" />
+            <span>{locationError}</span>
+          </div>
+        )}
+
         <div className="flex justify-between items-center mb-8">
           <div className="flex items-center space-x-4">
             <Leaf className="h-10 w-10 text-primary-green" />
