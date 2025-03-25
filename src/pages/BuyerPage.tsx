@@ -35,10 +35,16 @@ const BuyerPage: React.FC = () => {
 
   const categories = [
     "all",
-    "Raw Materials",
-    "Packaging",
-    "Equipment",
-    "Supplies",
+    "Recycled Paperboard Boxes",
+    "Comestible Paper Cups",
+    "Plant-based PLA Packaging",
+    "Mushroom Packaging",
+    "Kraft Paper Bags",
+    "Biodegradable Food Containers",
+    "Hemp-based Packaging",
+    "Edible Packaging",
+    "Glass Containers",
+    "Beeswax Wraps",
     "Other",
   ];
 

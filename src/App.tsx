@@ -1,4 +1,3 @@
-import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import HomePage from "./pages/HomePage";
@@ -8,7 +7,6 @@ import SellerPage from "./pages/SellerPage";
 import BuyerPage from "./pages/BuyerPage";
 import Footer from "./components/Footer";
 import ProtectedRoute from "./components/ProtectedRoute";
-import { Home } from "lucide-react";
 
 function App() {
   return (
