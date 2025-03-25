@@ -109,7 +109,7 @@ const ChatBot: React.FC<ChatBotProps> = ({ categories, onClose }) => {
       }}
     >
       {/* Header */}
-      <div className="flex items-center justify-between bg-emerald-600 text-white p-4 rounded-t-lg">
+      <div className="flex items-center justify-between bg-dark-teal text-white p-4 rounded-t-lg">
         {!isMinimized && (
           <div className="flex items-center">
             <MessageCircle className="h-5 w-5 mr-2" />
