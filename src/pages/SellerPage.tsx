@@ -246,7 +246,9 @@ const SellerPage: React.FC = () => {
               <h3 className="text-xl font-semibold text-gray-900">
                 {product.name}
               </h3>
-              <p className="text-gray-600 mt-2">{product.description}</p>
+              <p className="text-gray-600 mt-2">
+                Description:{product.description}
+              </p>
               <div className="mt-4 flex justify-between items-center">
                 {/* <span className="text-primary-green font-semibold">
                   ${product.price}
