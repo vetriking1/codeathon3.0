@@ -1,5 +1,5 @@
-import React from 'react';
-import { Leaf, Mail, Phone, MapPin } from 'lucide-react';
+import React from "react";
+import { Leaf, Mail, Phone, MapPin } from "lucide-react";
 
 const Footer = () => {
   return (
@@ -19,20 +19,52 @@ const Footer = () => {
           <div>
             <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
             <ul className="space-y-2">
-              <li><a href="#" className="hover:text-light-green transition">About Us</a></li>
-              <li><a href="#" className="hover:text-light-green transition">For Suppliers</a></li>
-              <li><a href="#" className="hover:text-light-green transition">For Buyers</a></li>
-              <li><a href="#" className="hover:text-light-green transition">Blog</a></li>
+              <li>
+                <a href="#" className="hover:text-light-green transition">
+                  About Us
+                </a>
+              </li>
+              <li>
+                <a href="#" className="hover:text-light-green transition">
+                  For Suppliers
+                </a>
+              </li>
+              <li>
+                <a href="#" className="hover:text-light-green transition">
+                  For Buyers
+                </a>
+              </li>
+              <li>
+                <a href="#" className="hover:text-light-green transition">
+                  Blog
+                </a>
+              </li>
             </ul>
           </div>
 
           <div>
             <h3 className="text-lg font-semibold mb-4">Categories</h3>
             <ul className="space-y-2">
-              <li><a href="#" className="hover:text-light-green transition">Biodegradable</a></li>
-              <li><a href="#" className="hover:text-light-green transition">Compostable</a></li>
-              <li><a href="#" className="hover:text-light-green transition">Recyclable</a></li>
-              <li><a href="#" className="hover:text-light-green transition">Zero Waste</a></li>
+              <li>
+                <a href="#" className="hover:text-light-green transition">
+                  Biodegradable
+                </a>
+              </li>
+              <li>
+                <a href="#" className="hover:text-light-green transition">
+                  Compostable
+                </a>
+              </li>
+              <li>
+                <a href="#" className="hover:text-light-green transition">
+                  Recyclable
+                </a>
+              </li>
+              <li>
+                <a href="#" className="hover:text-light-green transition">
+                  Zero Waste
+                </a>
+              </li>
             </ul>
           </div>
 
@@ -45,18 +77,21 @@ const Footer = () => {
               </li>
               <li className="flex items-center space-x-2">
                 <Phone className="h-5 w-5 text-light-green" />
-                <span>+1 (555) 123-4567</span>
+                <span>+91 987654321</span>
               </li>
               <li className="flex items-center space-x-2">
                 <MapPin className="h-5 w-5 text-light-green" />
-                <span>123 Eco Street, Green City</span>
+                <span>Chennai</span>
               </li>
             </ul>
           </div>
         </div>
 
         <div className="mt-8 pt-8 border-t border-primary-green text-center">
-          <p>&copy; {new Date().getFullYear()} OnTym Solutions. All rights reserved.</p>
+          <p>
+            &copy; {new Date().getFullYear()} OnTym Solutions. All rights
+            reserved.
+          </p>
         </div>
       </div>
     </footer>
