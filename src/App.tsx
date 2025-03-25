@@ -1,11 +1,14 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Navbar from './components/Navbar';
-import HomePage from './pages/HomePage';
-import LoginPage from './pages/auth/LoginPage';
-import RegisterPage from './pages/auth/RegisterPage';
-import Footer from './components/Footer';
-import ProtectedRoute from './components/ProtectedRoute';
+import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Navbar from "./components/Navbar";
+import HomePage from "./pages/HomePage";
+import LoginPage from "./pages/auth/LoginPage";
+import RegisterPage from "./pages/auth/RegisterPage";
+import SellerPage from "./pages/SellerPage";
+import BuyerPage from "./pages/BuyerPage";
+import Footer from "./components/Footer";
+import ProtectedRoute from "./components/ProtectedRoute";
+import { Home } from "lucide-react";
 
 function App() {
   return (
@@ -14,13 +17,22 @@ function App() {
         <Navbar />
         <main className="flex-grow">
           <Routes>
+            <Route path="/" element={<HomePage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route
-              path="/"
+              path="/buyer"
               element={
                 <ProtectedRoute>
-                  <HomePage />
+                  <BuyerPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/seller"
+              element={
+                <ProtectedRoute>
+                  <SellerPage />
                 </ProtectedRoute>
               }
             />

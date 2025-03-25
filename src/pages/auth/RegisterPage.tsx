@@ -21,7 +21,8 @@ interface FormData {
   email: string;
   password: string;
   username: string;
-  role: 'buyer' | 'supplier';
+  phoneNumber: string;
+  role: "buyer" | "supplier";
   sizeOfIndustry: string;
   productsExpected: string;
   productsOffered: string;
@@ -29,30 +30,36 @@ interface FormData {
   location: string;
 }
 
-interface SubmitData extends Omit<FormData, 'productsExpected' | 'productsOffered'> {
+interface SubmitData
+  extends Omit<FormData, "productsExpected" | "productsOffered"> {
   productsExpected: string[];
   productsOffered: string[];
 }
 
 const RegisterPage: React.FC = () => {
   const navigate = useNavigate();
-  const register = useAuthStore(state => state.register);
+  const register = useAuthStore((state) => state.register);
   const [formData, setFormData] = useState<FormData>({
-    email: '',
-    password: '',
-    username: '',
-    role: 'buyer',
-    sizeOfIndustry: '',
-    productsExpected: '',
-    productsOffered: '',
-    description: '',
-    location: '',
+    email: "",
+    password: "",
+    username: "",
+    phoneNumber: "",
+    role: "buyer",
+    sizeOfIndustry: "",
+    productsExpected: "",
+    productsOffered: "",
+    description: "",
+    location: "",
   });
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
+  ) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
@@ -60,17 +67,27 @@ const RegisterPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setError("");
 
     try {
       await register({
         ...formData,
-        productsExpected: formData.productsExpected.split(',').map(p => p.trim()).filter(Boolean),
-        productsOffered: formData.productsOffered.split(',').map(p => p.trim()).filter(Boolean),
+        productsExpected: formData.productsExpected
+          .split(",")
+          .map((p) => p.trim())
+          .filter(Boolean),
+        productsOffered: formData.productsOffered
+          .split(",")
+          .map((p) => p.trim())
+          .filter(Boolean),
       });
-      navigate('/');
+      if (formData.role === "buyer") {
+        navigate("/buyer");
+      } else {
+        navigate("/seller");
+      }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      setError(err instanceof Error ? err.message : "An error occurred");
     }
   };
 
@@ -146,6 +163,24 @@ const RegisterPage: React.FC = () => {
                 type="password"
                 required
                 value={formData.password}
+                onChange={handleChange}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-green focus:border-primary-green"
+              />
+            </div>
+
+            <div>
+              <label
+                htmlFor="phoneNumber"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Phone Number
+              </label>
+              <input
+                id="phoneNumber"
+                name="phoneNumber"
+                type="text"
+                required
+                value={formData.phoneNumber}
                 onChange={handleChange}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-green focus:border-primary-green"
               />

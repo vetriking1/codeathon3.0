@@ -1,10 +1,11 @@
 import mongoose from "mongoose";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 
 const userSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
+  phoneNumber: { type: String },
   role: { type: String, enum: ["buyer", "supplier"], required: true },
   sizeOfIndustry: { type: String },
   productsExpected: [{ type: String }],
@@ -30,9 +31,12 @@ userSchema.pre("save", async function (next) {
 // Method to compare password
 userSchema.methods.comparePassword = async function (candidatePassword) {
   try {
-    return await bcrypt.compare(candidatePassword, this.password);
+    // Ensure both passwords are strings and trimmed
+    const hashedPassword = String(this.password).trim();
+    const password = String(candidatePassword).trim();
+    return await bcrypt.compare(password, hashedPassword);
   } catch (err) {
-    throw new Error(err);
+    throw new Error("Error comparing passwords");
   }
 };
 

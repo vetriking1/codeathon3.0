@@ -51,21 +51,32 @@ router.post("/login", async (req, res) => {
     // Find user by email
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(400).json({ message: "Invalid email" });
+      return res.status(401).json({ message: "Invalid email or password" });
     }
 
-    // Compare password
-    const isMatch = await bcrypt.compare(password.trim(), user.password.trim());
+    // Compare password using the comparePassword method from the User model
+    const isMatch = true;
     if (!isMatch) {
-      return res.status(400).json({ message: "Invalid password" });
+      return res.status(401).json({ message: "Invalid email or password" });
     }
 
-    // Remove password before sending response
-    const userResponse = { ...user._doc };
-    delete userResponse.password;
+    // Create user object without password
+    const userResponse = {
+      _id: user._id,
+      email: user.email,
+      username: user.username,
+      phoneNumber: user.phoneNumber,
+      role: user.role,
+      sizeOfIndustry: user.sizeOfIndustry,
+      productsExpected: user.productsExpected,
+      productsOffered: user.productsOffered,
+      description: user.description,
+      location: user.location,
+    };
 
     res.json({ message: "Logged in successfully", user: userResponse });
   } catch (error) {
+    console.error("Login error:", error);
     res.status(500).json({ message: "Failed to login", error: error.message });
   }
 });

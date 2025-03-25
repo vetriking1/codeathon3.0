@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 import cors from "cors";
 import dotenv from "dotenv";
 import authRoutes from "./routes/auth.js";
-import postRoutes from "./routes/posts.js";
+import productRoutes from "./routes/products.js";
 
 dotenv.config();
 
@@ -21,7 +21,7 @@ mongoose
 
 // Use routes
 app.use("/auth", authRoutes);
-app.use("/posts", postRoutes);
+app.use("/products", productRoutes);
 
 // Root route
 app.get("/", (req, res) => {
@@ -34,14 +34,13 @@ app.get("/", (req, res) => {
         profile: "GET /auth/profile/:userId",
         updateProfile: "PUT /auth/profile/:userId",
       },
-      posts: {
-        create: "POST /posts",
-        getAll: "GET /posts",
-        getOne: "GET /posts/:id",
-        update: "PUT /posts/:id",
-        delete: "DELETE /posts/:id",
-        addComment: "POST /posts/:id/comments",
-        like: "POST /posts/:id/like",
+      products: {
+        create: "POST /products",
+        getAll: "GET /products",
+        getOne: "GET /products/:id",
+        update: "PUT /products/:id",
+        delete: "DELETE /products/:id",
+        getSellerProducts: "GET /products/seller/:sellerId",
       },
     },
   });

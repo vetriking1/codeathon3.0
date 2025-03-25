@@ -4,6 +4,7 @@ interface User {
   _id: string;
   email: string;
   username: string;
+  phoneNumber:string;
   role: "buyer" | "supplier";
   sizeOfIndustry?: string;
   productsExpected?: string[];
@@ -15,11 +16,12 @@ interface User {
 interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<User>;
   register: (formData: {
     email: string;
     password: string;
     username: string;
+    phoneNumber:string;
     role: "buyer" | "supplier";
     sizeOfIndustry?: string;
     productsExpected?: string[];
@@ -52,6 +54,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       const data = await response.json();
       set({ user: data.user, isAuthenticated: true });
       localStorage.setItem("user", JSON.stringify(data.user));
+      return data.user;
     } catch (error) {
       throw error;
     }
