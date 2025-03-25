@@ -12,6 +12,8 @@ import {
   MapPin,
   Info,
   MessageCircle,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 import ChatBot from "../components/ChatBot";
 
@@ -147,6 +149,8 @@ const BuyerPage: React.FC = () => {
   const [isEditingDescription, setIsEditingDescription] = useState(false);
   const [tempDescription, setTempDescription] = useState("");
   const [isUpdatingDescription, setIsUpdatingDescription] = useState(false);
+  const [showAirQuality, setShowAirQuality] = useState(false);
+  const [showRecommendations, setShowRecommendations] = useState(false);
 
   const categories = [
     "all",
@@ -382,9 +386,27 @@ const BuyerPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-beige">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {airQuality && (
-          <>
-            <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
+        {/* Air Quality Section - Collapsible */}
+        <div className="mb-6">
+          <button
+            onClick={() => setShowAirQuality(!showAirQuality)}
+            className="flex items-center justify-between w-full p-4 bg-white rounded-lg shadow-md hover:bg-gray-50 transition-colors"
+          >
+            <div className="flex items-center space-x-4">
+              <Wind className="h-6 w-6 text-primary-green" />
+              <h2 className="text-lg font-semibold text-dark-teal">
+                Air Quality Information
+              </h2>
+            </div>
+            {showAirQuality ? (
+              <ChevronUp className="h-5 w-5 text-gray-500" />
+            ) : (
+              <ChevronDown className="h-5 w-5 text-gray-500" />
+            )}
+          </button>
+
+          {showAirQuality && airQuality && (
+            <div className="mt-2 bg-white rounded-lg shadow-lg p-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-4">
                   <Wind className="h-8 w-8 text-primary-green" />
@@ -444,175 +466,203 @@ const BuyerPage: React.FC = () => {
                 </div>
               </div>
             </div>
+          )}
+        </div>
 
-            <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center space-x-4">
+        {/* Recommendations Section - Collapsible */}
+        <div className="mb-8">
+          <button
+            onClick={() => setShowRecommendations(!showRecommendations)}
+            className="flex items-center justify-between w-full p-4 bg-white rounded-lg shadow-md hover:bg-gray-50 transition-colors"
+          >
+            <div className="flex items-center space-x-4">
+              <Info className="h-6 w-6 text-primary-green" />
+              <h2 className="text-lg font-semibold text-dark-teal">
+                Packaging Recommendations
+              </h2>
+            </div>
+            {showRecommendations ? (
+              <ChevronUp className="h-5 w-5 text-gray-500" />
+            ) : (
+              <ChevronDown className="h-5 w-5 text-gray-500" />
+            )}
+          </button>
+
+          {showRecommendations && airQuality && (
+            <div className="mt-2 space-y-6">
+              {/* Personalized AI Recommendations */}
+              <div className="bg-white rounded-lg shadow-lg p-6">
+                <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center space-x-4">
+                    <Info className="h-8 w-8 text-primary-green" />
+                    <h2 className="text-xl font-semibold text-dark-teal">
+                      Personalized AI Recommendations
+                    </h2>
+                  </div>
+                  {!isEditingDescription && (
+                    <button
+                      onClick={() => setIsEditingDescription(true)}
+                      className="text-primary-green hover:text-opacity-80 text-sm font-medium"
+                    >
+                      Edit Profile Description
+                    </button>
+                  )}
+                </div>
+
+                <div className="space-y-4">
+                  {isEditingDescription ? (
+                    <div className="space-y-4">
+                      <div>
+                        <label
+                          htmlFor="description"
+                          className="block text-sm font-medium text-gray-700 mb-2"
+                        >
+                          Your Profile Description
+                        </label>
+                        <textarea
+                          id="description"
+                          value={tempDescription}
+                          onChange={(e) => setTempDescription(e.target.value)}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-green focus:border-primary-green"
+                          rows={4}
+                          placeholder="Tell us about your packaging requirements, industry, and any specific concerns..."
+                        />
+                      </div>
+                      <div className="flex space-x-4">
+                        <button
+                          onClick={updateUserDescription}
+                          disabled={isUpdatingDescription}
+                          className="flex-1 bg-primary-green text-white py-2 px-4 rounded-md hover:bg-opacity-90 transition-colors disabled:bg-gray-400"
+                        >
+                          {isUpdatingDescription
+                            ? "Updating..."
+                            : "Save Description"}
+                        </button>
+                        <button
+                          onClick={() => {
+                            setIsEditingDescription(false);
+                            setTempDescription(userDescription);
+                          }}
+                          className="flex-1 bg-gray-200 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-300 transition-colors"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="bg-gray-50 p-4 rounded-lg">
+                      <h3 className="text-sm font-medium text-gray-700 mb-2">
+                        Your Profile Description
+                      </h3>
+                      <p className="text-gray-600">
+                        {userDescription ||
+                          "No description provided. Click 'Edit Profile Description' to add one."}
+                      </p>
+                    </div>
+                  )}
+                  {recommendationError && (
+                    <div className="text-red-600 text-sm">
+                      {recommendationError}
+                    </div>
+                  )}
+
+                  <button
+                    onClick={getGeminiRecommendation}
+                    disabled={
+                      isLoadingRecommendation || !userDescription.trim()
+                    }
+                    className={`w-full flex items-center justify-center py-3 px-4 rounded-md text-white ${
+                      isLoadingRecommendation || !userDescription.trim()
+                        ? "bg-gray-400 cursor-not-allowed"
+                        : "px-6 py-3 bg-primary-green rounded-lg hover:bg-opacity-90 transition"
+                    } transition-colors`}
+                  >
+                    {isLoadingRecommendation ? (
+                      <>
+                        <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white mr-2"></div>
+                        Getting Recommendation...
+                      </>
+                    ) : (
+                      "Get Personalized Recommendation"
+                    )}
+                  </button>
+                  {geminiRecommendation && (
+                    <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+                      <h3 className="text-lg font-semibold text-dark-teal mb-2">
+                        Recommended Product:{" "}
+                        {geminiRecommendation.recommendedProduct}
+                      </h3>
+                      <div className="space-y-2">
+                        <p className="text-gray-700">
+                          <span className="font-medium">Reason:</span>{" "}
+                          {geminiRecommendation.reason}
+                        </p>
+                        <p className="text-gray-700">
+                          <span className="font-medium">
+                            Environmental Impact:
+                          </span>{" "}
+                          {geminiRecommendation.environmentalImpact}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Packaging Recommendations */}
+              <div className="bg-white rounded-lg shadow-lg p-6">
+                <div className="flex items-center space-x-4 mb-6">
                   <Info className="h-8 w-8 text-primary-green" />
                   <h2 className="text-xl font-semibold text-dark-teal">
-                    Personalized AI Recommendations
+                    Packaging Recommendations
                   </h2>
                 </div>
-                {!isEditingDescription && (
-                  <button
-                    onClick={() => setIsEditingDescription(true)}
-                    className="text-primary-green hover:text-opacity-80 text-sm font-medium"
-                  >
-                    Edit Profile Description
-                  </button>
-                )}
-              </div>
 
-              <div className="space-y-4">
-                {isEditingDescription ? (
-                  <div className="space-y-4">
-                    <div>
-                      <label
-                        htmlFor="description"
-                        className="block text-sm font-medium text-gray-700 mb-2"
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {getPackagingRecommendations(airQuality).map(
+                    (recommendation) => (
+                      <div
+                        key={recommendation.category}
+                        className="border rounded-lg p-4 hover:shadow-md transition-shadow"
                       >
-                        Your Profile Description
-                      </label>
-                      <textarea
-                        id="description"
-                        value={tempDescription}
-                        onChange={(e) => setTempDescription(e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-green focus:border-primary-green"
-                        rows={4}
-                        placeholder="Tell us about your packaging requirements, industry, and any specific concerns..."
-                      />
-                    </div>
-                    <div className="flex space-x-4">
-                      <button
-                        onClick={updateUserDescription}
-                        disabled={isUpdatingDescription}
-                        className="flex-1 bg-primary-green text-white py-2 px-4 rounded-md hover:bg-opacity-90 transition-colors disabled:bg-gray-400"
-                      >
-                        {isUpdatingDescription
-                          ? "Updating..."
-                          : "Save Description"}
-                      </button>
-                      <button
-                        onClick={() => {
-                          setIsEditingDescription(false);
-                          setTempDescription(userDescription);
-                        }}
-                        className="flex-1 bg-gray-200 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-300 transition-colors"
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <h3 className="text-sm font-medium text-gray-700 mb-2">
-                      Your Profile Description
-                    </h3>
-                    <p className="text-gray-600">
-                      {userDescription ||
-                        "No description provided. Click 'Edit Profile Description' to add one."}
-                    </p>
-                  </div>
-                )}
-                {recommendationError && (
-                  <div className="text-red-600 text-sm">
-                    {recommendationError}
-                  </div>
-                )}
-
-                <button
-                  onClick={getGeminiRecommendation}
-                  disabled={isLoadingRecommendation || !userDescription.trim()}
-                  className={`w-full flex items-center justify-center py-3 px-4 rounded-md text-white ${
-                    isLoadingRecommendation || !userDescription.trim()
-                      ? "bg-gray-400 cursor-not-allowed"
-                      : "px-6 py-3 bg-primary-green rounded-lg hover:bg-opacity-90 transition"
-                  } transition-colors`}
-                >
-                  {isLoadingRecommendation ? (
-                    <>
-                      <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white mr-2"></div>
-                      Getting Recommendation...
-                    </>
-                  ) : (
-                    "Get Personalized Recommendation"
-                  )}
-                </button>
-                {geminiRecommendation && (
-                  <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-                    <h3 className="text-lg font-semibold text-dark-teal mb-2">
-                      Recommended Product:{" "}
-                      {geminiRecommendation.recommendedProduct}
-                    </h3>
-                    <div className="space-y-2">
-                      <p className="text-gray-700">
-                        <span className="font-medium">Reason:</span>{" "}
-                        {geminiRecommendation.reason}
-                      </p>
-                      <p className="text-gray-700">
-                        <span className="font-medium">
-                          Environmental Impact:
-                        </span>{" "}
-                        {geminiRecommendation.environmentalImpact}
-                      </p>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
-              <div className="flex items-center space-x-4 mb-6">
-                <Info className="h-8 w-8 text-primary-green" />
-                <h2 className="text-xl font-semibold text-dark-teal">
-                  Packaging Recommendations
-                </h2>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {getPackagingRecommendations(airQuality).map(
-                  (recommendation) => (
-                    <div
-                      key={recommendation.category}
-                      className="border rounded-lg p-4 hover:shadow-md transition-shadow"
-                    >
-                      <h3 className="font-semibold text-dark-teal mb-2">
-                        {recommendation.category}
-                      </h3>
-                      <div className="flex items-center mb-2">
-                        <span
-                          className={`px-2 py-1 rounded text-xs ${
-                            recommendation.effectiveness === "high"
-                              ? "bg-green-100 text-green-800"
-                              : recommendation.effectiveness === "medium"
-                              ? "bg-yellow-100 text-yellow-800"
-                              : "bg-red-100 text-red-800"
-                          }`}
-                        >
-                          {recommendation.effectiveness.toUpperCase()}{" "}
-                          Effectiveness
-                        </span>
-                      </div>
-                      <p className="text-sm text-gray-600 mb-2">
-                        {recommendation.description}
-                      </p>
-                      <div className="flex flex-wrap gap-2">
-                        {recommendation.pollutants.map((pollutant) => (
+                        <h3 className="font-semibold text-dark-teal mb-2">
+                          {recommendation.category}
+                        </h3>
+                        <div className="flex items-center mb-2">
                           <span
-                            key={pollutant}
-                            className="bg-primary-green bg-opacity-10 text-primary-green px-2 py-1 rounded-full text-xs"
+                            className={`px-2 py-1 rounded text-xs ${
+                              recommendation.effectiveness === "high"
+                                ? "bg-green-100 text-green-800"
+                                : recommendation.effectiveness === "medium"
+                                ? "bg-yellow-100 text-yellow-800"
+                                : "bg-red-100 text-red-800"
+                            }`}
                           >
-                            {pollutant}
+                            {recommendation.effectiveness.toUpperCase()}{" "}
+                            Effectiveness
                           </span>
-                        ))}
+                        </div>
+                        <p className="text-sm text-gray-600 mb-2">
+                          {recommendation.description}
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          {recommendation.pollutants.map((pollutant) => (
+                            <span
+                              key={pollutant}
+                              className="bg-primary-green bg-opacity-10 text-primary-green px-2 py-1 rounded-full text-xs"
+                            >
+                              {pollutant}
+                            </span>
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                  )
-                )}
+                    )
+                  )}
+                </div>
               </div>
             </div>
-          </>
-        )}
+          )}
+        </div>
 
         {locationError && (
           <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-md mb-8 flex items-center">
@@ -621,6 +671,7 @@ const BuyerPage: React.FC = () => {
           </div>
         )}
 
+        {/* Marketplace Section */}
         <div className="flex justify-between items-center mb-8">
           <div className="flex items-center space-x-4">
             <Leaf className="h-10 w-10 text-primary-green" />
