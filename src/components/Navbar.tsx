@@ -1,7 +1,6 @@
-import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Leaf, Search, UserCircle } from 'lucide-react';
-import { useAuthStore } from '../store/authStore';
+import { Link, useNavigate } from "react-router-dom";
+import { Leaf, Search, UserCircle } from "lucide-react";
+import { useAuthStore } from "../store/authStore";
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -34,7 +33,7 @@ const Navbar = () => {
                 <button
                   onClick={() => {
                     logout();
-                    navigate('/');
+                    navigate("/");
                   }}
                   className="px-4 py-2 rounded-lg border border-light-green hover:bg-primary-green transition"
                 >
@@ -44,13 +43,13 @@ const Navbar = () => {
             ) : (
               <>
                 <button
-                  onClick={() => navigate('/register')}
+                  onClick={() => navigate("/register")}
                   className="px-4 py-2 rounded-lg bg-primary-green hover:bg-opacity-90 transition"
                 >
-                  For Suppliers
+                  Register
                 </button>
                 <button
-                  onClick={() => navigate('/login')}
+                  onClick={() => navigate("/login")}
                   className="flex items-center space-x-2 px-4 py-2 rounded-lg border border-light-green hover:bg-primary-green transition"
                 >
                   <UserCircle className="h-5 w-5" />

@@ -5,13 +5,36 @@ interface User {
   email: string;
   role: 'buyer' | 'supplier';
   name: string;
+  // Buyer specific fields
+  industrySize?: string;
+  productsExpected?: string[];
+  description?: string;
+  location?: string;
+  // Supplier specific fields
+  productsOffered?: string;
+  typesOfProducts?: string[];
 }
 
 interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (email: string, password: string, role: 'buyer' | 'supplier', name: string) => Promise<void>;
+  register: (
+    email: string, 
+    password: string, 
+    role: 'buyer' | 'supplier', 
+    name: string,
+    additionalInfo?: {
+      // Buyer specific fields
+      industrySize?: string;
+      productsExpected?: string[];
+      description?: string;
+      location?: string;
+      // Supplier specific fields
+      productsOffered?: string;
+      typesOfProducts?: string[];
+    }
+  ) => Promise<void>;
   logout: () => void;
 }
 
@@ -28,10 +51,22 @@ export const useAuthStore = create<AuthState>((set) => ({
       throw error;
     }
   },
-  register: async (email: string, password: string, role: 'buyer' | 'supplier', name: string) => {
+  register: async (
+    email: string, 
+    password: string, 
+    role: 'buyer' | 'supplier', 
+    name: string,
+    additionalInfo = {}
+  ) => {
     try {
       // TODO: Implement actual API call
-      const mockUser = { id: '1', email, role, name };
+      const mockUser = { 
+        id: '1', 
+        email, 
+        role, 
+        name,
+        ...additionalInfo
+      };
       set({ user: mockUser, isAuthenticated: true });
     } catch (error) {
       console.error('Registration failed:', error);

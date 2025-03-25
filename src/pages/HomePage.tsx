@@ -1,4 +1,3 @@
-import React from "react";
 import { Search, Package, Leaf, Recycle } from "lucide-react";
 
 const HomePage = () => {
