@@ -1,79 +1,87 @@
-import { create } from 'zustand';
+import { create } from "zustand";
 
 interface User {
-  id: string;
+  _id: string;
   email: string;
-  role: 'buyer' | 'supplier';
-  name: string;
-  // Buyer specific fields
-  industrySize?: string;
+  username: string;
+  role: "buyer" | "supplier";
+  sizeOfIndustry?: string;
   productsExpected?: string[];
+  productsOffered?: string[];
   description?: string;
   location?: string;
-  // Supplier specific fields
-  productsOffered?: string;
-  typesOfProducts?: string[];
 }
 
 interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (
-    email: string, 
-    password: string, 
-    role: 'buyer' | 'supplier', 
-    name: string,
-    additionalInfo?: {
-      // Buyer specific fields
-      industrySize?: string;
-      productsExpected?: string[];
-      description?: string;
-      location?: string;
-      // Supplier specific fields
-      productsOffered?: string;
-      typesOfProducts?: string[];
-    }
-  ) => Promise<void>;
+  register: (formData: {
+    email: string;
+    password: string;
+    username: string;
+    role: "buyer" | "supplier";
+    sizeOfIndustry?: string;
+    productsExpected?: string[];
+    productsOffered?: string[];
+    description?: string;
+    location?: string;
+  }) => Promise<void>;
   logout: () => void;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   isAuthenticated: false,
+
   login: async (email: string, password: string) => {
     try {
-      // TODO: Implement actual API call
-      const mockUser = { id: '1', email, role: 'buyer' as const, name: 'John Doe' };
-      set({ user: mockUser, isAuthenticated: true });
+      const response = await fetch("http://localhost:3000/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Login failed");
+      }
+
+      const data = await response.json();
+      set({ user: data.user, isAuthenticated: true });
+      localStorage.setItem("user", JSON.stringify(data.user));
     } catch (error) {
-      console.error('Login failed:', error);
       throw error;
     }
   },
-  register: async (
-    email: string, 
-    password: string, 
-    role: 'buyer' | 'supplier', 
-    name: string,
-    additionalInfo = {}
-  ) => {
+
+  register: async (formData) => {
     try {
-      // TODO: Implement actual API call
-      const mockUser = { 
-        id: '1', 
-        email, 
-        role, 
-        name,
-        ...additionalInfo
-      };
-      set({ user: mockUser, isAuthenticated: true });
+      const response = await fetch("http://localhost:3000/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Registration failed");
+      }
+
+      const data = await response.json();
+      set({ user: data.user, isAuthenticated: true });
+      localStorage.setItem("user", JSON.stringify(data.user));
     } catch (error) {
-      console.error('Registration failed:', error);
       throw error;
     }
   },
+
   logout: () => {
     set({ user: null, isAuthenticated: false });
+    localStorage.removeItem("user");
   },
 }));

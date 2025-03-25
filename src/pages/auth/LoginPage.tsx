@@ -1,48 +1,52 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Leaf } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 
-const LoginPage = () => {
+const LoginPage: React.FC = () => {
   const navigate = useNavigate();
-  const login = useAuthStore((state) => state.login);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const login = useAuthStore(state => state.login);
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+  });
   const [error, setError] = useState('');
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
+
     try {
-      await login(email, password);
-      navigate('/dashboard');
+      await login(formData.email, formData.password);
+      navigate('/');
     } catch (err) {
-      setError('Invalid credentials. Please try again.');
+      setError(err instanceof Error ? err.message : 'An error occurred');
     }
   };
 
   return (
-    <div className="min-h-screen bg-beige flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-lg shadow-lg">
-        <div className="text-center">
-          <div className="flex justify-center">
-            <Leaf className="h-12 w-12 text-primary-green" />
-          </div>
-          <h2 className="mt-6 text-3xl font-bold text-dark-teal">Welcome back</h2>
-          <p className="mt-2 text-sm text-gray-600">
-            Sign in to access your account
-          </p>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full space-y-8">
+        <div>
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+            Sign in to your account
+          </h2>
         </div>
-
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           {error && (
-            <div className="bg-red-50 text-red-500 p-3 rounded-md text-sm">
-              {error}
+            <div className="rounded-md bg-red-50 p-4">
+              <div className="text-sm text-red-700">{error}</div>
             </div>
           )}
-          
-          <div className="space-y-4">
+          <div className="rounded-md shadow-sm -space-y-px">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="email" className="sr-only">
                 Email address
               </label>
               <input
@@ -50,14 +54,14 @@ const LoginPage = () => {
                 name="email"
                 type="email"
                 required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-green focus:border-primary-green"
+                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                placeholder="Email address"
+                value={formData.email}
+                onChange={handleChange}
               />
             </div>
-
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="password" className="sr-only">
                 Password
               </label>
               <input
@@ -65,9 +69,10 @@ const LoginPage = () => {
                 name="password"
                 type="password"
                 required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-green focus:border-primary-green"
+                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                placeholder="Password"
+                value={formData.password}
+                onChange={handleChange}
               />
             </div>
           </div>
@@ -75,24 +80,12 @@ const LoginPage = () => {
           <div>
             <button
               type="submit"
-              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-green hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-green"
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             >
               Sign in
             </button>
           </div>
         </form>
-
-        <div className="text-center mt-4">
-          <p className="text-sm text-gray-600">
-            Don't have an account?{' '}
-            <button
-              onClick={() => navigate('/register')}
-              className="font-medium text-primary-green hover:text-opacity-90"
-            >
-              Register here
-            </button>
-          </p>
-        </div>
       </div>
     </div>
   );

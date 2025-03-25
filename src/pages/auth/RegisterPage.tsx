@@ -17,51 +17,60 @@ const productList = [
   "Shrink Wrap",
 ];
 
-const RegisterPage = () => {
+interface FormData {
+  email: string;
+  password: string;
+  username: string;
+  role: 'buyer' | 'supplier';
+  sizeOfIndustry: string;
+  productsExpected: string;
+  productsOffered: string;
+  description: string;
+  location: string;
+}
+
+interface SubmitData extends Omit<FormData, 'productsExpected' | 'productsOffered'> {
+  productsExpected: string[];
+  productsOffered: string[];
+}
+
+const RegisterPage: React.FC = () => {
   const navigate = useNavigate();
-  const register = useAuthStore((state) => state.register);
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-    name: "",
-    role: "buyer" as "buyer" | "supplier",
-    // Buyer specific fields
-    industrySize: "small",
-    productsExpected: [] as string[],
-    description: "",
-    location: "",
-    // Supplier specific fields
-    productsOffered: "small",
-    typesOfProducts: [] as string[],
+  const register = useAuthStore(state => state.register);
+  const [formData, setFormData] = useState<FormData>({
+    email: '',
+    password: '',
+    username: '',
+    role: 'buyer',
+    sizeOfIndustry: '',
+    productsExpected: '',
+    productsOffered: '',
+    description: '',
+    location: '',
   });
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    try {
-      const additionalInfo =
-        formData.role === "buyer"
-          ? {
-              industrySize: formData.industrySize,
-              productsExpected: formData.productsExpected,
-              description: formData.description,
-              location: formData.location,
-            }
-          : {
-              productsOffered: formData.productsOffered,
-              typesOfProducts: formData.typesOfProducts,
-            };
+    setError('');
 
-      await register(
-        formData.email,
-        formData.password,
-        formData.role,
-        formData.name,
-        additionalInfo
-      );
-      navigate("/dashboard");
+    try {
+      await register({
+        ...formData,
+        productsExpected: formData.productsExpected.split(',').map(p => p.trim()).filter(Boolean),
+        productsOffered: formData.productsOffered.split(',').map(p => p.trim()).filter(Boolean),
+      });
+      navigate('/');
     } catch (err) {
-      setError("Registration failed. Please try again.");
+      setError(err instanceof Error ? err.message : 'An error occurred');
     }
   };
 
@@ -90,20 +99,18 @@ const RegisterPage = () => {
           <div className="space-y-4">
             <div>
               <label
-                htmlFor="name"
+                htmlFor="username"
                 className="block text-sm font-medium text-gray-700"
               >
-                Full Name
+                Username
               </label>
               <input
-                id="name"
-                name="name"
+                id="username"
+                name="username"
                 type="text"
                 required
-                value={formData.name}
-                onChange={(e) =>
-                  setFormData({ ...formData, name: e.target.value })
-                }
+                value={formData.username}
+                onChange={handleChange}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-green focus:border-primary-green"
               />
             </div>
@@ -121,9 +128,7 @@ const RegisterPage = () => {
                 type="email"
                 required
                 value={formData.email}
-                onChange={(e) =>
-                  setFormData({ ...formData, email: e.target.value })
-                }
+                onChange={handleChange}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-green focus:border-primary-green"
               />
             </div>
@@ -141,9 +146,7 @@ const RegisterPage = () => {
                 type="password"
                 required
                 value={formData.password}
-                onChange={(e) =>
-                  setFormData({ ...formData, password: e.target.value })
-                }
+                onChange={handleChange}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-green focus:border-primary-green"
               />
             </div>
@@ -159,12 +162,7 @@ const RegisterPage = () => {
                 id="role"
                 name="role"
                 value={formData.role}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    role: e.target.value as "buyer" | "supplier",
-                  })
-                }
+                onChange={handleChange}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-green focus:border-primary-green"
               >
                 <option value="buyer">Buyer</option>
@@ -179,24 +177,19 @@ const RegisterPage = () => {
 
                 <div>
                   <label
-                    htmlFor="industrySize"
+                    htmlFor="sizeOfIndustry"
                     className="block text-sm font-medium text-gray-700"
                   >
                     Size of Industry
                   </label>
-                  <select
-                    id="industrySize"
-                    name="industrySize"
-                    value={formData.industrySize}
-                    onChange={(e) =>
-                      setFormData({ ...formData, industrySize: e.target.value })
-                    }
+                  <input
+                    id="sizeOfIndustry"
+                    name="sizeOfIndustry"
+                    type="text"
+                    value={formData.sizeOfIndustry}
+                    onChange={handleChange}
                     className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-green focus:border-primary-green"
-                  >
-                    <option value="small">Small</option>
-                    <option value="medium">Medium</option>
-                    <option value="large">Large</option>
-                  </select>
+                  />
                 </div>
 
                 <div>
@@ -204,38 +197,16 @@ const RegisterPage = () => {
                     htmlFor="productsExpected"
                     className="block text-sm font-medium text-gray-700"
                   >
-                    Type of Products Expected
+                    Products Expected (comma-separated)
                   </label>
-                  <div className="mt-1 grid grid-cols-2 gap-2">
-                    {productList.map((product) => (
-                      <div key={product} className="flex items-center">
-                        <input
-                          id={`product-${product}`}
-                          name="productsExpected"
-                          type="checkbox"
-                          checked={formData.productsExpected.includes(product)}
-                          onChange={(e) => {
-                            const updatedProducts = e.target.checked
-                              ? [...formData.productsExpected, product]
-                              : formData.productsExpected.filter(
-                                  (p) => p !== product
-                                );
-                            setFormData({
-                              ...formData,
-                              productsExpected: updatedProducts,
-                            });
-                          }}
-                          className="h-4 w-4 text-primary-green focus:ring-primary-green border-gray-300 rounded"
-                        />
-                        <label
-                          htmlFor={`product-${product}`}
-                          className="ml-2 block text-sm text-gray-700"
-                        >
-                          {product}
-                        </label>
-                      </div>
-                    ))}
-                  </div>
+                  <input
+                    id="productsExpected"
+                    name="productsExpected"
+                    type="text"
+                    value={formData.productsExpected}
+                    onChange={handleChange}
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-green focus:border-primary-green"
+                  />
                 </div>
 
                 <div>
@@ -243,17 +214,14 @@ const RegisterPage = () => {
                     htmlFor="description"
                     className="block text-sm font-medium text-gray-700"
                   >
-                    Description (Optional)
+                    Description
                   </label>
                   <textarea
                     id="description"
                     name="description"
                     rows={3}
                     value={formData.description}
-                    onChange={(e) =>
-                      setFormData({ ...formData, description: e.target.value })
-                    }
-                    placeholder="Provide a description about your business and what you expect"
+                    onChange={handleChange}
                     className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-green focus:border-primary-green"
                   />
                 </div>
@@ -269,12 +237,8 @@ const RegisterPage = () => {
                     id="location"
                     name="location"
                     type="text"
-                    required
                     value={formData.location}
-                    onChange={(e) =>
-                      setFormData({ ...formData, location: e.target.value })
-                    }
-                    placeholder="Where are you based"
+                    onChange={handleChange}
                     className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-green focus:border-primary-green"
                   />
                 </div>
@@ -292,64 +256,16 @@ const RegisterPage = () => {
                     htmlFor="productsOffered"
                     className="block text-sm font-medium text-gray-700"
                   >
-                    Products Offered For
+                    Products Offered (comma-separated)
                   </label>
-                  <select
+                  <input
                     id="productsOffered"
                     name="productsOffered"
+                    type="text"
                     value={formData.productsOffered}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        productsOffered: e.target.value,
-                      })
-                    }
+                    onChange={handleChange}
                     className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-green focus:border-primary-green"
-                  >
-                    <option value="small">Small Scale Industries</option>
-                    <option value="medium">Medium Scale Industries</option>
-                    <option value="large">Large Scale Industries</option>
-                    <option value="all">All Scales</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="typesOfProducts"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Types of Products Offered
-                  </label>
-                  <div className="mt-1 grid grid-cols-2 gap-2">
-                    {productList.map((product) => (
-                      <div key={product} className="flex items-center">
-                        <input
-                          id={`supplier-product-${product}`}
-                          name="typesOfProducts"
-                          type="checkbox"
-                          checked={formData.typesOfProducts.includes(product)}
-                          onChange={(e) => {
-                            const updatedProducts = e.target.checked
-                              ? [...formData.typesOfProducts, product]
-                              : formData.typesOfProducts.filter(
-                                  (p) => p !== product
-                                );
-                            setFormData({
-                              ...formData,
-                              typesOfProducts: updatedProducts,
-                            });
-                          }}
-                          className="h-4 w-4 text-primary-green focus:ring-primary-green border-gray-300 rounded"
-                        />
-                        <label
-                          htmlFor={`supplier-product-${product}`}
-                          className="ml-2 block text-sm text-gray-700"
-                        >
-                          {product}
-                        </label>
-                      </div>
-                    ))}
-                  </div>
+                  />
                 </div>
 
                 <div>
@@ -363,12 +279,8 @@ const RegisterPage = () => {
                     id="location"
                     name="location"
                     type="text"
-                    required
                     value={formData.location}
-                    onChange={(e) =>
-                      setFormData({ ...formData, location: e.target.value })
-                    }
-                    placeholder="Where are you based"
+                    onChange={handleChange}
                     className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-green focus:border-primary-green"
                   />
                 </div>
