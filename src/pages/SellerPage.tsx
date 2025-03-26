@@ -7,8 +7,6 @@ interface Product {
   description: string;
   imageUrl: string;
   category: string;
-  price: number;
-  quantity: number;
   createdAt: string;
 }
 
@@ -35,8 +33,6 @@ const SellerPage: React.FC = () => {
     description: "",
     imageUrl: "",
     category: "Other",
-    price: 0,
-    quantity: 0,
   });
   const [error, setError] = useState("");
 
@@ -67,26 +63,33 @@ const SellerPage: React.FC = () => {
     const { name, value } = e.target;
     setNewProduct((prev) => ({
       ...prev,
-      [name]: name === "price" || name === "quantity" ? Number(value) : value,
+      [name]: value,
     }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      // Log the request body for debugging
+      const requestBody = {
+        ...newProduct,
+        seller: user?._id,
+      };
+      console.log('Sending request with body:', requestBody);
+
       const response = await fetch("http://localhost:3000/products", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          ...newProduct,
-          seller: user?._id,
-        }),
+        body: JSON.stringify(requestBody),
       });
 
       if (!response.ok) {
-        throw new Error("Failed to create product");
+        // Log the error response for debugging
+        const errorData = await response.json();
+        console.error('Server response:', errorData);
+        throw new Error(errorData.message || "Failed to create product");
       }
 
       await fetchProducts();
@@ -95,12 +98,11 @@ const SellerPage: React.FC = () => {
         name: "",
         description: "",
         imageUrl: "",
-        category: "Raw Materials",
-        price: 0,
-        quantity: 0,
+        category: "Other",
       });
     } catch (err) {
-      setError("Failed to create product");
+      console.error("Error details:", err);
+      setError(err instanceof Error ? err.message : "Failed to create product");
     }
   };
 
@@ -187,41 +189,10 @@ const SellerPage: React.FC = () => {
                   className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-green focus:border-primary-green"
                 >
                   {categories.map((category) => (
-                    <option value={category}>{category}</option>
+                    <option key={category} value={category}>{category}</option>
                   ))}
                 </select>
               </div>
-
-              {/* <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Price
-                </label>
-                <input
-                  type="number"
-                  name="price"
-                  value={newProduct.price}
-                  onChange={handleInputChange}
-                  required
-                  min="0"
-                  step="0.01"
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-green focus:border-primary-green"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Quantity
-                </label>
-                <input
-                  type="number"
-                  name="quantity"
-                  value={newProduct.quantity}
-                  onChange={handleInputChange}
-                  required
-                  min="0"
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-green focus:border-primary-green"
-                />
-              </div> */}
 
               <div className="flex justify-end space-x-3 mt-6">
                 <button

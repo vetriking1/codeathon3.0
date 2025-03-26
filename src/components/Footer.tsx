@@ -1,5 +1,5 @@
 import { Leaf, Mail, Phone, MapPin } from "lucide-react";
-
+import { Link } from "react-router-dom";
 const Footer = () => {
   return (
     <footer className="bg-dark-teal text-white">
@@ -19,24 +19,25 @@ const Footer = () => {
             <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
             <ul className="space-y-2">
               <li>
-                <a href="#" className="hover:text-light-green transition">
-                  About Us
-                </a>
+                <Link to="/about" className="hover:text-light-green transition">
+                  About us
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-light-green transition">
+                <Link
+                  to="/register"
+                  className="hover:text-light-green transition"
+                >
                   For Suppliers
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-light-green transition">
+                <Link
+                  to="/register"
+                  className="hover:text-light-green transition"
+                >
                   For Buyers
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-light-green transition">
-                  Blog
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
@@ -45,24 +46,36 @@ const Footer = () => {
             <h3 className="text-lg font-semibold mb-4">Categories</h3>
             <ul className="space-y-2">
               <li>
-                <a href="#" className="hover:text-light-green transition">
+                <Link
+                  to="/biodegradables"
+                  className="hover:text-light-green transition"
+                >
                   Biodegradable
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-light-green transition">
-                  Compostable
-                </a>
+                <Link
+                  to="/compostables"
+                  className="hover:text-light-green transition"
+                >
+                  Compostables
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-light-green transition">
-                  Recyclable
-                </a>
+                <Link
+                  to="/recyclables"
+                  className="hover:text-light-green transition"
+                >
+                  Recyclables
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-light-green transition">
+                <Link
+                  to="/zerowaste"
+                  className="hover:text-light-green transition"
+                >
                   Zero Waste
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
@@ -72,11 +85,18 @@ const Footer = () => {
             <ul className="space-y-2">
               <li className="flex items-center space-x-2">
                 <Mail className="h-5 w-5 text-light-green" />
-                <span>contact@ontymsolutions.com</span>
+                <a
+                  href="mailto:contactontym@gmail.com"
+                  className="hover:underline"
+                >
+                  contactontym@gmail.com
+                </a>
               </li>
               <li className="flex items-center space-x-2">
                 <Phone className="h-5 w-5 text-light-green" />
-                <span>+91 987654321</span>
+                <a href="tel:+91987654321" className="hover:underline">
+                  +91 987654321
+                </a>
               </li>
               <li className="flex items-center space-x-2">
                 <MapPin className="h-5 w-5 text-light-green" />

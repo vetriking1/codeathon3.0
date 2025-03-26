@@ -1,54 +1,45 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const productSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
-    trim: true
+    trim: true,
   },
   description: {
     type: String,
-    required: true
+    required: true,
   },
   imageUrl: {
     type: String,
-    required: true
+    required: true,
   },
   category: {
     type: String,
     required: true,
-    enum: ['Raw Materials', 'Packaging', 'Equipment', 'Supplies', 'Other']
+    enum: ["Raw Materials", "Packaging", "Equipment", "Supplies", "Other"],
   },
   seller: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
-  },
-  price: {
-    type: Number,
-    required: true
-  },
-  quantity: {
-    type: Number,
+    ref: "User",
     required: true,
-    min: 0
   },
   createdAt: {
     type: Date,
-    default: Date.now
+    default: Date.now,
   },
   updatedAt: {
     type: Date,
-    default: Date.now
-  }
+    default: Date.now,
+  },
 });
 
 // Update the updatedAt timestamp before saving
-productSchema.pre('save', function(next) {
+productSchema.pre("save", function (next) {
   this.updatedAt = new Date();
   next();
 });
 
-const Product = mongoose.model('Product', productSchema);
+const Product = mongoose.model("Product", productSchema);
 
-export default Product; 
+export default Product;
