@@ -264,7 +264,7 @@ const BiodegradablePage = () => {
           </p>
           <button
             className="px-8 py-4 bg-dark-teal rounded-lg hover:bg-opacity-90 transition"
-            onClick={() => navigate("/register")}
+            onClick={() => navigate("/buyer")}
           >
             Find Biodegradable Suppliers
           </button>

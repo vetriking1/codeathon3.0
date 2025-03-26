@@ -338,7 +338,7 @@ const RecyclablePage = () => {
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <button
               className="px-8 py-4 bg-dark-teal rounded-lg hover:bg-opacity-90 transition"
-              onClick={() => navigate("/register")}
+              onClick={() => navigate("/buyer")}
             >
               Find Recyclable Packaging Suppliers
             </button>

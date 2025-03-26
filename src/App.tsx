@@ -13,10 +13,11 @@ import BiodegradablePage from "./pages/Biodegradables";
 import CompostablePage from "./pages/Compostables";
 import RecyclablePage from "./pages/Recyclables";
 import ZeroWastePage from "./pages/Zerowaste";
-
+import ScrollToTop from "./components/ScrollToTop";
 function App() {
   return (
     <Router>
+      <ScrollToTop />
       <div className="min-h-screen bg-beige flex flex-col">
         <Navbar />
         <main className="flex-grow">

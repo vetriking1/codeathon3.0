@@ -296,12 +296,12 @@ const ZeroWastePage = () => {
                     participation in zero waste systems.
                   </p>
                 </div>
-                <button
+                {/* <button
                   className="mt-4 px-6 py-3 bg-primary-green text-white rounded-lg hover:bg-opacity-90 transition"
-                  onClick={() => navigate("/register")}
+                  onClick={() => navigate("/buyer")}
                 >
                   Start Your Zero Waste Journey
-                </button>
+                </button> */}
               </div>
             </div>
             <div className="bg-dark-teal flex items-center justify-center p-8">
@@ -348,7 +348,7 @@ const ZeroWastePage = () => {
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <button
               className="px-8 py-4 bg-dark-teal rounded-lg hover:bg-opacity-90 transition"
-              onClick={() => navigate("/register")}
+              onClick={() => navigate("/buyer")}
             >
               Find Zero Waste Suppliers
             </button>
