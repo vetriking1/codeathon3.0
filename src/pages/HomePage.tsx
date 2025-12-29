@@ -1,6 +1,7 @@
 import { Search, Package, Leaf, Recycle } from "lucide-react";
 import { redirect } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import logoImage from "./imag-logo.png";
 
 const HomePage = () => {
   const navigate = useNavigate();
@@ -36,7 +37,7 @@ const HomePage = () => {
             </div>
             <div className="relative">
               <img
-                src="https://roozrang.com/wp-content/uploads/2023/03/What-is-sustainable-packaging-2-1024x640.jpg"
+                src={logoImage}
                 alt="Sustainable Packaging"
                 className="rounded-lg shadow-xl"
               />

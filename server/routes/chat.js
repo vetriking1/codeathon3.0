@@ -1,12 +1,12 @@
 import express from "express";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const genAI = new GoogleGenerativeAI("AIzaSyD6dSCWYv5L1FjgHe4XIVJz7EK13_art1I");
+const genAI = new GoogleGenerativeAI("");
 
 async function handleChatRequest(message, context) {
   try {
     // Use the correct model identifier
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
     // Sanitize and prepare chat history
     let history = [];
@@ -79,7 +79,7 @@ router.post("/recommend", async (req, res) => {
       return res.status(400).json({ error: "Description is required" });
     }
 
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
     // Create a prompt that includes both the user description and air quality data
     const prompt = `Based on the following buyer description and air quality data, recommend the most suitable eco-friendly packaging solution. Consider both the buyer's needs and the environmental conditions.
@@ -106,10 +106,11 @@ Important: Respond with ONLY the JSON object, no additional text or formatting.`
     const result = await model.generateContent(prompt);
     const response = result.response;
     const text = response.text();
-    
+
     try {
+      console.log(text);
       // Clean the response text to ensure it's valid JSON
-      const cleanText = text.replace(/```json\n?|\n?```/g, '').trim();
+      const cleanText = text.replace(/```json\n?|\n?```/g, "").trim();
       const recommendation = JSON.parse(cleanText);
       res.json(recommendation);
     } catch (parseError) {

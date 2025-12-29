@@ -150,7 +150,7 @@ const BuyerPage: React.FC = () => {
   const [tempDescription, setTempDescription] = useState("");
   const [isUpdatingDescription, setIsUpdatingDescription] = useState(false);
   const [showAirQuality, setShowAirQuality] = useState(false);
-  const [showRecommendations, setShowRecommendations] = useState(false);
+  const [showRecommendations, setShowRecommendations] = useState(true);
 
   const categories = [
     "all",
